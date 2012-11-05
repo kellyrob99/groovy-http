@@ -67,11 +67,8 @@ dependencies {
 [jettyRun, jettyRunWar,jettyStop]*.httpPort = 8081
 [jettyRun, jettyRunWar,jettyStop]*.stopPort = 8082
 [jettyRun, jettyRunWar,jettyStop]*.stopKey = 'stopKey'
-//test {
-//    exclude '**/*Integration*.*'
-//}
+
 test {
-//    include '**/*Integration*.*'
     doFirst {
         jettyRun.daemon = true
         jettyRun.execute()

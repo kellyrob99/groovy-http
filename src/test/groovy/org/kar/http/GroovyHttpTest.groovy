@@ -14,6 +14,8 @@ class GroovyHttpTest extends Specification {
   </body>
 </html>'''
 
+    private static final String POST_RESPONSE = 'Successfully posted [arg:[foo]] with method POST\n'
+
     static int httpPort
     static String appName
 
@@ -24,7 +26,7 @@ class GroovyHttpTest extends Specification {
 
     def "from a String to an HTTP GET"() {
         when:
-        String html = "http://localhost:$httpPort/$appName/helloWorld.groovy".toURL().text
+        String html = makeURL('helloWorld.groovy').toURL().text
 
         then:
         html == HELLO_WORLD_HTML
@@ -33,7 +35,7 @@ class GroovyHttpTest extends Specification {
     def "from a String to URLConnection"() {
         when:
         String html
-        "http://localhost:$httpPort/$appName/helloWorld.groovy".toURL().openConnection().inputStream.withReader { Reader reader ->
+        makeURL('helloWorld.groovy').toURL().openConnection().inputStream.withReader { Reader reader ->
             html = reader.text
         }
 
@@ -42,6 +44,26 @@ class GroovyHttpTest extends Specification {
     }
 
     def "POST from a URLConnection"(){
+        when:
+        final HttpURLConnection connection = makeURL('post.groovy').toURL().openConnection()
+        connection.setDoOutput(true)
+        connection.outputStream.withWriter {Writer writer ->
+            writer << "arg=foo"
+        }
 
+        String response
+        connection.inputStream.withReader {Reader reader ->
+            response =  reader.text
+        }
+
+        then:
+        connection.responseCode == 200
+        response == POST_RESPONSE
+    }
+
+
+
+    private static String makeURL(String page) {
+        "http://localhost:$httpPort/$appName/$page"
     }
 }
