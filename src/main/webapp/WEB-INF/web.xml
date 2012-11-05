@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+   <!-- General description of your web application -->
+   <display-name>groovy-http - Webapp</display-name>
+      <description>
+        Samples of how Groovy helps with HTTP.
+   </description>
+
+    <servlet>
+        <servlet-name>GroovyPages</servlet-name>
+        <servlet-class>groovy.servlet.TemplateServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GroovyPages</servlet-name>
+        <url-pattern>*.gsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Groovy</servlet-name>
+        <servlet-class>groovy.servlet.GroovyServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Groovy</servlet-name>
+        <url-pattern>*.groovy</url-pattern>
+    </servlet-mapping>
+</web-app>

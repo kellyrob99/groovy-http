@@ -1,0 +1,84 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.mapvine:gradle-cobertura-plugin:1.0'
+    }
+}
+
+apply plugin: 'cobertura'
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'jetty'
+apply plugin: 'maven'
+apply plugin: 'project-report'
+
+group = 'org.kar'
+
+repositories {
+    mavenCentral()
+    maven { url 'http://static.appfuse.org/repository' }
+    maven { url 'https://repository.jboss.org/nexus/content/repositories/releases' }
+}
+
+configurations {
+    all*.exclude group: 'commons-logging', module: 'commons-logging'
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+ext.versions = [
+        'groovy': '2.0.5',
+        'jsp': '2.1',
+        'junit': '4.10',
+        'servlet': '2.5',
+        'jstl': '1.2',
+        'log4j': '1.2.13',
+        'slf4j': '1.6.1',
+        'log4j': '1.2.16',
+        'spock': '0.7-groovy-2.0',
+        'hsqldb': '2.2.8',
+        'cglib': '2.2.2'
+]
+
+dependencies {
+    providedCompile "javax.servlet.jsp:jsp-api:${versions.jsp}"
+    providedCompile "javax.servlet:servlet-api:${versions.servlet}"
+    providedCompile "javax.servlet:jstl:${versions.jstl}"
+
+    groovy "org.codehaus.groovy:groovy-all:${versions.groovy}"
+    compile "org.slf4j:slf4j-api:${versions.slf4j}"
+    compile "log4j:log4j:${versions.log4j}"
+    runtime "org.slf4j:jcl-over-slf4j:${versions.slf4j}"
+    runtime "org.slf4j:slf4j-log4j12:${versions.slf4j}"
+
+    runtime "org.hsqldb:hsqldb:${versions.hsqldb}"
+
+    testCompile "junit:junit:${versions.junit}"
+    testCompile "org.spockframework:spock-core:${versions.spock}"
+}
+
+[jettyRun, jettyRunWar,jettyStop]*.httpPort = 8081
+[jettyRun, jettyRunWar,jettyStop]*.stopPort = 8082
+[jettyRun, jettyRunWar,jettyStop]*.stopKey = 'stopKey'
+//test {
+//    exclude '**/*Integration*.*'
+//}
+test {
+//    include '**/*Integration*.*'
+    doFirst {
+        jettyRun.daemon = true
+        jettyRun.execute()
+    }
+    doLast {
+        jettyStop.execute()
+    }
+    systemProperty 'httpPort', jettyRun.httpPort
+    systemProperty 'appName', project.name
+}
