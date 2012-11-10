@@ -1,1 +1,1 @@
-println "Successfully posted ${request.parameterMap} with method ${request.method}"
+print "Successfully posted ${request.parameterMap} with method ${request.method}"

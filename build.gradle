@@ -22,14 +22,13 @@ repositories {
     maven { url 'https://repository.jboss.org/nexus/content/repositories/releases' }
 }
 
-configurations {
-    all*.exclude group: 'commons-logging', module: 'commons-logging'
-}
-
 idea {
     module {
         downloadJavadoc = true
         downloadSources = true
+        inheritOutputDirs = false
+        outputDir = sourceSets.main.output.classesDir
+        testOutputDir = sourceSets.test.output.classesDir
     }
 }
 
@@ -55,6 +54,9 @@ dependencies {
     groovy "org.codehaus.groovy:groovy-all:${versions.groovy}"
     compile "org.slf4j:slf4j-api:${versions.slf4j}"
     compile "log4j:log4j:${versions.log4j}"
+    compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2'){
+        exclude module : 'groovy'
+    }
     runtime "org.slf4j:jcl-over-slf4j:${versions.slf4j}"
     runtime "org.slf4j:slf4j-log4j12:${versions.slf4j}"
 
@@ -64,11 +66,12 @@ dependencies {
     testCompile "org.spockframework:spock-core:${versions.spock}"
 }
 
-[jettyRun, jettyRunWar,jettyStop]*.httpPort = 8081
-[jettyRun, jettyRunWar,jettyStop]*.stopPort = 8082
-[jettyRun, jettyRunWar,jettyStop]*.stopKey = 'stopKey'
+[jettyRun, jettyRunWar]*.httpPort = 8081
+[jettyRun, jettyRunWar, jettyStop]*.stopPort = 8082
+[jettyRun, jettyRunWar, jettyStop]*.stopKey = 'stopKey'
 
 test {
+    jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
     doFirst {
         jettyRun.daemon = true
         jettyRun.execute()
@@ -79,3 +82,8 @@ test {
     systemProperty 'httpPort', jettyRun.httpPort
     systemProperty 'appName', project.name
 }
+
+jettyRun {
+    scanIntervalSeconds = 1
+}
+defaultTasks 'jettyRun'
