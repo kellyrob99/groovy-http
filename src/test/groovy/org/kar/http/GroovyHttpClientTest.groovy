@@ -44,6 +44,14 @@ class GroovyHttpClientTest extends Specification {
 
     def "from a String to an HTTP GET"() {
         when:
+        String html = makeURL('').toURL().text
+
+        then:
+        html == new File('src/main/webapp/index.html').text
+    }
+
+    def "from a String to an HTTP GET on a servlet"() {
+        when:
         String html = makeURL('helloWorld.groovy').toURL().text
 
         then:
@@ -195,12 +203,8 @@ class GroovyHttpClientTest extends Specification {
 
     def "POST with HTTPBuilder"() {
         when:
-        String response
-        int responseStatus
-
-        http.post(path: 'post.groovy', body: [arg: 'foo']) { resp, reader ->
-            responseStatus = resp.status
-            response = reader.text()
+        def (response, responseStatus) = http.post(path: 'post.groovy', body: [arg: 'foo']) { resp, reader ->
+            [reader.text(),resp.status]
         }
 
         then:
@@ -209,14 +213,10 @@ class GroovyHttpClientTest extends Specification {
     }
 
     def "POST reverse example"() {
-        when:
-        String response
-        int responseStatus
-
         final String foo = 'foo bar'
-        http.post(path: 'reverse.groovy', body: [string: foo]) { resp, reader ->
-            responseStatus = resp.status
-            response = reader.text()
+        when:
+        def (response, responseStatus) = http.post(path: 'reverse.groovy', body: [string: foo]) { resp, reader ->
+            [reader.text(),resp.status]
         }
 
         then:
