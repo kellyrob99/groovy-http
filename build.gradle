@@ -1,9 +1,11 @@
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
     }
     dependencies {
         classpath 'com.mapvine:gradle-cobertura-plugin:1.0'
+        classpath 'com.ullink.gradle:gradle-repositories-plugin:1.1-SNAPSHOT' //https://github.com/gluck/gradle-repositories-plugin
     }
 }
 
@@ -13,13 +15,20 @@ apply plugin: 'idea'
 apply plugin: 'jetty'
 apply plugin: 'maven'
 apply plugin: 'project-report'
+apply plugin: 'repositories'
 
 group = 'org.kar'
+// http://stackoverflow.com/questions/8958267/java-lang-verifyerror-expecting-a-stackmap-frame
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 
 repositories {
     mavenCentral()
     maven { url 'http://static.appfuse.org/repository' }
     maven { url 'https://repository.jboss.org/nexus/content/repositories/releases' }
+    maven { url 'http://maven.restlet.org' }
+//    http://groovy-restlet.googlecode.com/files/groovy-restlet-0.3-SNAPSHOT.jar
+    googlecode('groovy-restlet')
 }
 
 idea {
@@ -54,16 +63,30 @@ dependencies {
     groovy "org.codehaus.groovy:groovy-all:${versions.groovy}"
     compile "org.slf4j:slf4j-api:${versions.slf4j}"
     compile "log4j:log4j:${versions.log4j}"
+
     compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2'){
         exclude module : 'groovy'
     }
+
+    compile 'groovy-restlet:groovy-restlet:0.3-SNAPSHOT'
+    compile 'org.restlet:org.restlet:1.1.10'
+    compile 'org.springframework:spring-context:2.5.6'
+    compile 'com.noelios.restlet:com.noelios.restlet:1.1.10'
 
     runtime "org.slf4j:jcl-over-slf4j:${versions.slf4j}"
     runtime "org.slf4j:slf4j-log4j12:${versions.slf4j}"
     runtime "org.hsqldb:hsqldb:${versions.hsqldb}"
 
+    testCompile 'org.vert-x:vertx-lang-groovy:1.2.3.final'
     testCompile "junit:junit:${versions.junit}"
     testCompile "org.spockframework:spock-core:${versions.spock}"
+    testCompile 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.0.v20120127'    // this one works !
+//    testCompile 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.4.v20120524'    //java.lang.SecurityException
+//    testCompile 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.5.v20120716'    //java.lang.SecurityException
+//    testCompile 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.3.v20120416'    //java.lang.SecurityException
+//    testCompile 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.2.v20120308'    //java.lang.SecurityException
+//    testCompile 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.1.v20120215'    //java.lang.SecurityException
+
 }
 
 [jettyRun, jettyRunWar]*.httpPort = 8081
@@ -90,5 +113,5 @@ jettyRun {
 defaultTasks 'jettyRun'
 
 task wrapper(type: Wrapper){
-    gradleVersion = '1.3-rc-1'
+    gradleVersion = '1.3'
 }
