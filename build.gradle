@@ -6,6 +6,7 @@ buildscript {
     dependencies {
         classpath 'com.mapvine:gradle-cobertura-plugin:1.0'
         classpath 'com.ullink.gradle:gradle-repositories-plugin:1.1-SNAPSHOT' //https://github.com/gluck/gradle-repositories-plugin
+        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.6.0'  //https://github.com/hierynomus/license-gradle-plugin
     }
 }
 
@@ -16,6 +17,7 @@ apply plugin: 'jetty'
 apply plugin: 'maven'
 apply plugin: 'project-report'
 apply plugin: 'repositories'
+apply plugin: 'license'
 
 group = 'org.kar'
 // http://stackoverflow.com/questions/8958267/java-lang-verifyerror-expecting-a-stackmap-frame
@@ -27,8 +29,7 @@ repositories {
     maven { url 'http://static.appfuse.org/repository' }
     maven { url 'https://repository.jboss.org/nexus/content/repositories/releases' }
     maven { url 'http://maven.restlet.org' }
-//    http://groovy-restlet.googlecode.com/files/groovy-restlet-0.3-SNAPSHOT.jar
-    googlecode('groovy-restlet')
+    googlecode('groovy-restlet') // http://groovy-restlet.googlecode.com/files/groovy-restlet-0.3-SNAPSHOT.jar
 }
 
 idea {
@@ -108,6 +109,10 @@ test {
 
 jettyRun {
     scanIntervalSeconds = 1
+}
+
+license {
+    header rootProject.file('src/main/resources/license.txt')
 }
 
 defaultTasks 'jettyRun'
