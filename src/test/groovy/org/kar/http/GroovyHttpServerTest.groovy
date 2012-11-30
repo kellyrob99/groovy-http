@@ -11,6 +11,7 @@ import java.util.concurrent.Executors
 import javax.servlet.http.HttpServletResponse
 
 import spock.lang.*
+import org.vertx.groovy.core.http.HttpClientRequest
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,40 +27,39 @@ class GroovyHttpServerTest extends Specification {
     static final String TEST_STRING = 'foobar'
     static final String MISSING_STRING_PARAM = "Missing 'string' param"
 
-    @Shared
-    com.sun.net.httpserver.HttpServer httpServer
-
-    @Shared
-    Server jettyServer
-
-    @Shared
-    org.restlet.Server restletServer
-
-    @Shared
-    org.restlet.Client restletClient
+    @Shared com.sun.net.httpserver.HttpServer httpServer
+    @Shared org.eclipse.jetty.server.Server jettyServer
+    @Shared org.restlet.Server restletServer
+    @Shared org.restlet.Client restletClient
 
     def setupSpec() {
         // http://www.java2s.com/Tutorial/Java/0320__Network/LightweightHTTPServer.htm
         //configuring a Java 6 HttpServer
-        InetSocketAddress addr = new InetSocketAddress(HTTP_SERVER_PORT);
-        httpServer = com.sun.net.httpserver.HttpServer.create(addr, 0);
-        httpServer.createContext("/", new MyEchoHandler());
-        httpServer.setExecutor(Executors.newCachedThreadPool());
-        httpServer.start();
+        InetSocketAddress addr = new InetSocketAddress(HTTP_SERVER_PORT)
+        httpServer = com.sun.net.httpserver.HttpServer.create(addr, 0)
+        httpServer.with {
+            createContext('/', new MyEchoHandler())
+            setExecutor(Executors.newCachedThreadPool())
+            start()
+        }
 
         //configuring Jetty 8 with GroovyServlet support
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS)
+        context.with {
+            contextPath = '/'
+            resourceBase = 'src/main/webapp'
+            addServlet(GroovyServlet, '*.groovy')
+        }
         jettyServer = new Server(JETTY_SERVER_PORT)
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
-        context.setContextPath("/");
-        jettyServer.setHandler(context);
-        context.resourceBase = 'src/main/webapp'
-        context.addServlet(GroovyServlet, '*.groovy')
-        jettyServer.start()
+        jettyServer.with {
+            setHandler(context)
+            start()
+        }
 
         //configuring a Restlet Server and Client using an external dsl file
         GroovyRestlet gr = new GroovyRestlet()
         gr.builder.setVariable('port', RESTLET_SERVER_PORT)
-        (restletClient, restletServer) = gr.build(new File('src/test/resources/restlet/reverseRestlet.groovy').toURI())
+        (restletClient, restletServer) = gr.build(new File('src/test/resources/restlet/reverseRestlet.groovy').toURI()) as List
     }
 
     def "HttpServer reverse test"() {
@@ -127,8 +127,8 @@ class GroovyHttpServerTest extends Specification {
     def "embedded vert.x"() {
         when: 'We run a vert.x server and create a matching vert.x client'
         Vertx vertx = Vertx.newVertx()
-        final HttpServer server = vertx.createHttpServer()
-        server.requestHandler { req ->
+        final org.vertx.groovy.core.http.HttpServer server = vertx.createHttpServer()
+        server.requestHandler { HttpClientRequest req ->
             if (req.params.get('string') == null) {
                 req.response.with {
                     statusCode = 400
