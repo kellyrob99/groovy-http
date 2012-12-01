@@ -1,0 +1,29 @@
+// START SNIPPET groovy-http::Listing1.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Groovy HTTP</title>
+</head>
+<body>
+<p>hello world</p>
+</body>
+</html>
+// END SNIPPET groovy-http::Listing1.html
+
+// START SNIPPET groovy-http::Listing2.groovy
+String html = 'http://localhost:8081/groovy-http'.toURL().text
+// END SNIPPET groovy-http::Listing2.groovy
+
+// START SNIPPET groovy-http::Listing4.groovy
+URL html = new URL('http://localhost:8081/groovy-http/index.html');
+URLConnection urlConnection = html.openConnection();
+BufferedReader reader = new BufferedReader(
+	new InputStreamReader(urlConnection.getInputStream()));
+StringBuffer response = new StringBuffer();
+String inputLine;
+while ((inputLine = reader.readLine()) != null)
+{
+	response.append(inputLine)
+}
+reader.close();
+// END SNIPPET groovy-http::Listing4.groovy

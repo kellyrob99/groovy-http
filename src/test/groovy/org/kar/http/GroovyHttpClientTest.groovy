@@ -39,8 +39,9 @@ class GroovyHttpClientTest extends Specification {
   </body>
 </html>'''
 
+    // START SNIPPET groovy-http::Listing5.groovy
     private static final String POST_RESPONSE = 'Successfully posted [arg:[foo]] with method POST'
-
+    // END SNIPPET groovy-http::Listing5.groovy
     static int httpPort
     static String appName
 
@@ -86,6 +87,7 @@ class GroovyHttpClientTest extends Specification {
         response.toString().trim() == HELLO_WORLD_HTML
     }
 
+    // START SNIPPET groovy-http::Listing3.groovy
     @Unroll("The url #url should throw an exception of type #exception")
     def "exceptions can be thrown converting a String to URL and accessing the text"() {
         when:
@@ -99,6 +101,7 @@ class GroovyHttpClientTest extends Specification {
         'htp://foo.com'              | MalformedURLException
         'http://google.com/notThere' | FileNotFoundException
     }
+    // END SNIPPET groovy-http::Listing3.groovy
 
     def "from a String to GET with a Reader"() {
         when:
@@ -123,7 +126,7 @@ class GroovyHttpClientTest extends Specification {
         connection.responseCode == HttpServletResponse.SC_NOT_FOUND
         def e = thrown(FileNotFoundException)
     }
-
+    // START SNIPPET groovy-http::Listing5.groovy
     def "POST from a URLConnection"() {
         when:
         final HttpURLConnection connection = makeURL('post.groovy').toURL().openConnection()
@@ -138,6 +141,7 @@ class GroovyHttpClientTest extends Specification {
         connection.responseCode == HttpServletResponse.SC_OK
         response == POST_RESPONSE
     }
+    // END SNIPPET groovy-http::Listing5.groovy
 
     def "Java version of POST from a URLConnection"() {
         when:
@@ -163,6 +167,7 @@ class GroovyHttpClientTest extends Specification {
         response.toString() == POST_RESPONSE
     }
 
+    // START SNIPPET groovy-http::Listing8.groovy
     def "GET with HTTPBuilder"() {
         when:
         def (html, responseStatus) = http.get(path: 'helloWorld.groovy', contentType: TEXT) { resp, reader ->
@@ -173,7 +178,9 @@ class GroovyHttpClientTest extends Specification {
         responseStatus == HttpServletResponse.SC_OK
         html == HELLO_WORLD_HTML
     }
+    // END SNIPPET groovy-http::Listing8.groovy
 
+    // START SNIPPET groovy-http::Listing9.groovy
     def "GET with HTTPBuilder and automatic parsing"() {
         when:
         def (html, responseStatus) = http.get(path: 'helloWorld.groovy') { resp, reader ->
@@ -185,7 +192,9 @@ class GroovyHttpClientTest extends Specification {
         html instanceof GPathResult
         html.BODY.P.text() == 'hello world'
     }
+    // END SNIPPET groovy-http::Listing9.groovy
 
+    // START SNIPPET groovy-http::Listing10.groovy
     def "GET with HTTPBuilder and automatic JSON parsing"() {
         when:
         def (json, responseStatus) = http.get(path: 'indexJson.groovy', contentType: JSON) { resp, reader ->
@@ -197,7 +206,9 @@ class GroovyHttpClientTest extends Specification {
         json instanceof JSONObject
         json.html.body.p == 'hello world'
     }
+    // END SNIPPET groovy-http::Listing10.groovy
 
+    // START SNIPPET groovy-http::Listing11.groovy
     def "GET with HTTPBuilder and error handling"() {
         when:
         int responseStatus
@@ -211,7 +222,9 @@ class GroovyHttpClientTest extends Specification {
         then:
         responseStatus == HttpServletResponse.SC_NOT_FOUND
     }
+    // END SNIPPET groovy-http::Listing11.groovy
 
+    // START SNIPPET groovy-http::Listing12.groovy
     def "POST with HTTPBuilder"() {
         when:
         def (response, responseStatus) = http.post(path: 'post.groovy', body: [arg: 'foo']) { resp, reader ->
@@ -222,6 +235,7 @@ class GroovyHttpClientTest extends Specification {
         responseStatus == HttpServletResponse.SC_OK
         response == POST_RESPONSE
     }
+    // END SNIPPET groovy-http::Listing12.groovy
 
     def "POST reverse example"() {
         final String foo = 'foo bar'
@@ -235,6 +249,7 @@ class GroovyHttpClientTest extends Specification {
         response == foo.reverse()
     }
 
+    // START SNIPPET groovy-http::Listing6.groovy
     def "HttpClient example in Java"() {
         when:
         HttpClient httpclient = new DefaultHttpClient();
@@ -245,12 +260,15 @@ class GroovyHttpClientTest extends Specification {
         then:
         responseBody == HELLO_WORLD_HTML
     }
+    // END SNIPPET groovy-http::Listing6.groovy
 
     //less verbose version of HttpClient example in Java
     def "HttpClient example in Java as a one-liner"() {
         when:
+        // START SNIPPET groovy-http::Listing7.groovy
         String response = new DefaultHttpClient().execute(new HttpGet(makeURL("helloWorld.groovy")),
                 new BasicResponseHandler())
+        // END SNIPPET groovy-http::Listing7.groovy
 
         then:
         response == HELLO_WORLD_HTML

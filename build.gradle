@@ -10,6 +10,7 @@ buildscript {
         classpath 'com.mapvine:gradle-cobertura-plugin:1.0'
         classpath 'com.ullink.gradle:gradle-repositories-plugin:1.1-SNAPSHOT' //https://github.com/gluck/gradle-repositories-plugin
         classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.6.0'  //https://github.com/hierynomus/license-gradle-plugin
+        classpath 'org.kar:gradle-snippet-plugin:1.0-SNAPSHOT'
     }
 }
 
@@ -21,6 +22,7 @@ apply plugin: 'maven'
 apply plugin: 'project-report'
 apply plugin: 'repositories'
 apply plugin: 'license'
+apply plugin: 'gradle-snippet-plugin'
 
 group = 'org.kar'
 // http://stackoverflow.com/questions/8958267/java-lang-verifyerror-expecting-a-stackmap-frame
@@ -118,136 +120,18 @@ license {
     header rootProject.file('LICENSE.txt')
 }
 
-defaultTasks 'jettyRun'
-
 task wrapper(type: Wrapper) {
     gradleVersion = '1.3'
 }
 
-task extractSnippets(type: ExtractSnippetsTask) {
+extractSnippets {
     source sourceSets.test.allSource, sourceSets.main.allSource, file('src/main/webapp'), file('jettyStarter.groovy')
     snippetsDir = file("$buildDir/snippets")
 }
 
-/**
- * Produces the snippets files for a set of sample source files.
- */
-public class ExtractSnippetsTask extends SourceTask {
-    @OutputDirectory
-    File snippetsDir
-
-    final Pattern START_XML = Pattern.compile('\\s*<!--\\s*START\\s+SNIPPET\\s+(\\S+)\\s*-->')
-    final Pattern END_XML = Pattern.compile('\\s*<!--\\s*END\\s+SNIPPET\\s+(\\S+)\\s*-->')
-    final Pattern START_ANY = Pattern.compile('\\s*//\\s*START\\s+SNIPPET\\s+(\\S+)\\s*')
-    final Pattern END_ANY = Pattern.compile('\\s*//\\s*END\\s+SNIPPET\\s+(\\S+)\\s*')
-
-    @TaskAction
-    def extract() {
-        source.visit { FileVisitDetails details ->
-            String name = details.relativePath.pathString
-            if (!details.file.isDirectory()) {
-                File srcFile = details.file
-                Map writers = [:]
-                Pattern startSnippetPattern
-                Pattern endSnippetPattern
-                if (name.endsWith('.xml')) {
-                    startSnippetPattern = START_XML
-                    endSnippetPattern = END_XML
-                } else {
-                    startSnippetPattern = START_ANY
-                    endSnippetPattern = END_ANY
-                }
-
-                try {
-                    // Can't use eachLine {} because it throws away blank lines
-                    srcFile.withReader {Reader r ->
-                        BufferedReader reader = new BufferedReader(r)
-
-                        reader.readLines().each {String line ->
-                            Matcher m = startSnippetPattern.matcher(line)
-                            if (m.matches()) {
-                                String snippetName = m.group(1)
-                                String subDirName
-                                File subDir
-                                if(snippetName.contains('::')){
-                                    (subDirName, snippetName) = snippetName.split('::')
-                                }
-                                if(subDirName)
-                                {
-                                    subDir = new File(snippetsDir, subDirName)
-                                    subDir.mkdirs()
-                                }
-                                if (!writers[snippetName]) {
-                                    File snippetFile = new File(subDir ?: snippetsDir, snippetName)
-                                    writers.put(snippetName, new SnippetWriter("Snippet $snippetName in $name", snippetFile))
-                                }
-                                writers[snippetName].start()
-                                return
-                            }
-                            m = endSnippetPattern.matcher(line)
-                            if (m.matches()) {
-                                String snippetName = m.group(1)
-                                writers[snippetName].end()
-                                return
-                            }
-                            writers.values().each {SnippetWriter w ->
-                                w.println(line)
-                            }
-                        }
-                    }
-                } finally {
-                    writers.values().each {SnippetWriter w ->
-                        w.close()
-                    }
-                }
-            }
-        }
-    }
+task extractSnippets2(type: org.kar.ExtractSnippetsTask) {
+    source sourceSets.test.allSource, sourceSets.main.allSource, file('src/main/webapp'), file('jettyStarter.groovy')
+    snippetsDir = file("$buildDir/snippets2")
 }
 
-class SnippetWriter {
-
-    private final File dest
-    private final String displayName
-    private boolean appendToFile
-    private Writer writer
-    private static int minIndent
-
-    def SnippetWriter(String displayName, File dest) {
-        this.dest = dest
-        this.displayName = displayName
-    }
-
-    def start() {
-        if (writer) {
-            throw new RuntimeException("$displayName is already started.")
-        }
-        dest.parentFile.mkdirs()
-        writer = new StringWriter()
-        appendToFile = true
-        this
-    }
-
-    def println(String line) {
-        if (writer) {
-            writer.println(line)
-        }
-    }
-
-    def end() {
-        if (!writer) {
-            throw new RuntimeException("$displayName was not started.")
-        }
-        dest.withWriter {Writer w ->
-            w.append(writer.toString().stripIndent())
-        }
-        close()
-    }
-
-    def close() {
-        if (writer) {
-            writer.close()
-        }
-        writer = null
-    }
-}
+defaultTasks 'jettyRun'
