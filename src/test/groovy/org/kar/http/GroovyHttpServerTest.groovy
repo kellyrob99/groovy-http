@@ -51,6 +51,7 @@ class GroovyHttpServerTest extends Specification {
         httpServer = com.sun.net.httpserver.HttpServer.create(addr, 0)
         httpServer.with {
             createContext('/', new ReverseHandler())
+            createContext('/groovy/', new GroovyReverseHandler())
             setExecutor(Executors.newCachedThreadPool())
             start()
         }
@@ -91,6 +92,27 @@ class GroovyHttpServerTest extends Specification {
         when: 'We forget to include the required parameter to HttpServer'
         String html
         final HttpURLConnection connection = HTTP_SERVER_HOST.toURL().openConnection()
+        connection.inputStream.withReader { Reader reader ->
+            html = reader.text
+        }
+
+        then: 'An exception is thrown and we get an HTTP 400 response'
+        connection.responseCode == HttpServletResponse.SC_BAD_REQUEST
+        def e = thrown(IOException)
+    }
+
+    def "HttpServer Groovy handler reverse test"() {
+        when: 'We execute a GET request against HttpServer'
+        def response = "$HTTP_SERVER_HOST/groovy/?string=$TEST_STRING".toURL().text
+
+        then: 'We get the same text back in reverse'
+        response == TEST_STRING.reverse()
+    }
+
+    def "HttpServer Groovy handler missing params test"() {
+        when: 'We forget to include the required parameter to HttpServer'
+        String html
+        final HttpURLConnection connection = "$HTTP_SERVER_HOST/groovy/".toURL().openConnection()
         connection.inputStream.withReader { Reader reader ->
             html = reader.text
         }

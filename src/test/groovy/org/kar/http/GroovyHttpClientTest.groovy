@@ -71,8 +71,8 @@ class GroovyHttpClientTest extends Specification {
 
     def "Java version to read from URL"() {
         when:
-        URL oracle = new URL(makeURL('helloWorld.groovy'));
-        URLConnection urlConnection = oracle.openConnection();
+        URL url = new URL(makeURL('helloWorld.groovy'));
+        URLConnection urlConnection = url.openConnection();
         BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
         StringBuffer response = new StringBuffer();
         String inputLine;

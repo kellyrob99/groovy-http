@@ -115,7 +115,7 @@ jettyRun {
 }
 
 license {
-    header rootProject.file('src/main/resources/license.txt')
+    header rootProject.file('LICENSE.txt')
 }
 
 defaultTasks 'jettyRun'
@@ -127,7 +127,6 @@ task wrapper(type: Wrapper) {
 task extractSnippets(type: ExtractSnippetsTask) {
     source sourceSets.test.allSource, sourceSets.main.allSource, file('src/main/webapp'), file('jettyStarter.groovy')
     snippetsDir = file("$buildDir/snippets")
-    snippetsDir = file('/Users/krobinson/Dropbox/writing/groovyAndHttpServers/Listings')
 }
 
 /**
@@ -168,8 +167,18 @@ public class ExtractSnippetsTask extends SourceTask {
                             Matcher m = startSnippetPattern.matcher(line)
                             if (m.matches()) {
                                 String snippetName = m.group(1)
+                                String subDirName
+                                File subDir
+                                if(snippetName.contains('::')){
+                                    (subDirName, snippetName) = snippetName.split('::')
+                                }
+                                if(subDirName)
+                                {
+                                    subDir = new File(snippetsDir, subDirName)
+                                    subDir.mkdirs()
+                                }
                                 if (!writers[snippetName]) {
-                                    File snippetFile = new File(snippetsDir, snippetName)
+                                    File snippetFile = new File(subDir ?: snippetsDir, snippetName)
                                     writers.put(snippetName, new SnippetWriter("Snippet $snippetName in $name", snippetFile))
                                 }
                                 writers[snippetName].start()
