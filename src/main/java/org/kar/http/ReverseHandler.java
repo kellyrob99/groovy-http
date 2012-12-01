@@ -21,7 +21,8 @@ import java.io.*;
  * Created with IntelliJ IDEA.
  * User: krobinson
  */
-class MyEchoHandler implements HttpHandler {
+// START SNIPPET Listing2.java
+class ReverseHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange httpExchange) throws IOException
     {
@@ -46,3 +47,4 @@ class MyEchoHandler implements HttpHandler {
         }
     }
 }
+// END SNIPPET Listing2.java

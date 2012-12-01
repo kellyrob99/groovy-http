@@ -9,11 +9,12 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
+// START SNIPPET Listing7.groovy
 import org.restlet.data.*
 
 def myPort = builder.getVariable('port')
 def server = builder.server(protocol: protocol.HTTP, port: myPort) {
-    restlet(handle: {org.restlet.data.Request req, resp ->
+    restlet(handle: {Request req, Response resp ->
         Form form = req.resourceRef.queryAsForm
         if (form.isEmpty() || !form[0].name == 'string') {
             resp.setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "Missing 'string' param")
@@ -23,10 +24,10 @@ def server = builder.server(protocol: protocol.HTTP, port: myPort) {
         }
     })
 }
-
 server.start();
 
 def client = builder.client(protocol: protocol.HTTP)
 
 [client, server] //return a list so we can work with the client and eventually stop the server
+// END SNIPPET Listing7.groovy
 

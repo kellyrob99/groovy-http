@@ -16,7 +16,6 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import org.lpny.groovyrestlet.GroovyRestlet
 import org.vertx.groovy.core.Vertx
-import org.vertx.groovy.core.http.HttpServer
 
 import java.util.concurrent.Executors
 import javax.servlet.http.HttpServletResponse
@@ -37,6 +36,7 @@ class GroovyHttpServerTest extends Specification {
     static final int RESTLET_SERVER_PORT = 8092
     static final String TEST_STRING = 'foobar'
     static final String MISSING_STRING_PARAM = "Missing 'string' param"
+    static final int VERTX_PORT = 8083
 
     @Shared com.sun.net.httpserver.HttpServer httpServer
     @Shared org.eclipse.jetty.server.Server jettyServer
@@ -45,15 +45,18 @@ class GroovyHttpServerTest extends Specification {
 
     def setupSpec() {
         // http://www.java2s.com/Tutorial/Java/0320__Network/LightweightHTTPServer.htm
+        // START SNIPPET Listing1.groovy
         //configuring a Java 6 HttpServer
         InetSocketAddress addr = new InetSocketAddress(HTTP_SERVER_PORT)
         httpServer = com.sun.net.httpserver.HttpServer.create(addr, 0)
         httpServer.with {
-            createContext('/', new MyEchoHandler())
+            createContext('/', new ReverseHandler())
             setExecutor(Executors.newCachedThreadPool())
             start()
         }
+        // END SNIPPET Listing1.groovy
 
+        // START SNIPPET Listing3.groovy
         //configuring Jetty 8 with GroovyServlet support
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS)
         context.with {
@@ -66,11 +69,14 @@ class GroovyHttpServerTest extends Specification {
             setHandler(context)
             start()
         }
+        // END SNIPPET Listing3.groovy
 
+        // START SNIPPET Listing6.groovy
         //configuring a Restlet Server and Client using an external dsl file
         GroovyRestlet gr = new GroovyRestlet()
         gr.builder.setVariable('port', RESTLET_SERVER_PORT)
         (restletClient, restletServer) = gr.build(new File('src/test/resources/restlet/reverseRestlet.groovy').toURI()) as List
+        // END SNIPPET Listing6.groovy
     }
 
     def "HttpServer reverse test"() {
@@ -115,6 +121,7 @@ class GroovyHttpServerTest extends Specification {
         def e = thrown(IOException)
     }
 
+    // START SNIPPET Listing8.groovy
     def "restlet"() {
         when: 'We use the Restlet Client to execute a GET request against the Restlet Server'
         String response = restletClient.get("http://localhost:$RESTLET_SERVER_PORT/?string=$TEST_STRING").entity.text
@@ -122,7 +129,9 @@ class GroovyHttpServerTest extends Specification {
         then: 'We get the same text back in reverse'
         TEST_STRING.reverse() == response
     }
+    // END SNIPPET Listing8.groovy
 
+    // START SNIPPET Listing9.groovy
     def "restlet failure"() {
         when: 'We forget to include the required parameter to Restlet'
         org.restlet.data.Response response = restletClient.get("http://localhost:$RESTLET_SERVER_PORT")
@@ -134,13 +143,15 @@ class GroovyHttpServerTest extends Specification {
         response.status.description == MISSING_STRING_PARAM
         null == response.entity.text
     }
+    // END SNIPPET Listing9.groovy
 
     def "embedded vert.x"() {
         when: 'We run a vert.x server and create a matching vert.x client'
+        // START SNIPPET Listing10.groovy
         Vertx vertx = Vertx.newVertx()
         final org.vertx.groovy.core.http.HttpServer server = vertx.createHttpServer()
         server.requestHandler { HttpClientRequest req ->
-            if (req.params.get('string') == null) {
+            if (req.params['string'] == null) {
                 req.response.with {
                     statusCode = 400
                     statusMessage = MISSING_STRING_PARAM
@@ -151,11 +162,16 @@ class GroovyHttpServerTest extends Specification {
                 req.response.end(req.params['string'].reverse())
             }
 
-        }.listen(8083, 'localhost')
+        }.listen(VERTX_PORT, 'localhost')
+        // END SNIPPET Listing10.groovy
 
-        def client = vertx.createHttpClient(port: 8083, host: 'localhost')
+        // START SNIPPET Listing11.groovy
+        def client = vertx.createHttpClient(port: VERTX_PORT, host: 'localhost')
+        // END SNIPPET Listing11.groovy
 
         then: 'We get our standard error and success'
+        // START SNIPPET Listing12.groovy
+
         client.getNow("/") { resp ->
             400 == resp.statusCode
             MISSING_STRING_PARAM == resp.statusMessage
@@ -167,6 +183,7 @@ class GroovyHttpServerTest extends Specification {
                 TEST_STRING.reverse() == buffer.toString()
             }
         }
+        // END SNIPPET Listing12.groovy
 
         cleanup:
         server.close()
