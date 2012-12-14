@@ -10,7 +10,7 @@ buildscript {
         classpath 'com.mapvine:gradle-cobertura-plugin:1.0'
         classpath 'com.ullink.gradle:gradle-repositories-plugin:1.1-SNAPSHOT' //https://github.com/gluck/gradle-repositories-plugin
         classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.6.0'  //https://github.com/hierynomus/license-gradle-plugin
-        classpath 'org.kar:gradle-snippet-plugin:1.0-SNAPSHOT'
+        classpath 'org.kar:code-snippet-plugin:1.0-SNAPSHOT'
     }
 }
 
@@ -22,7 +22,7 @@ apply plugin: 'maven'
 apply plugin: 'project-report'
 apply plugin: 'repositories'
 apply plugin: 'license'
-apply plugin: 'gradle-snippet-plugin'
+apply plugin: 'codeSnippet'
 
 group = 'org.kar'
 // http://stackoverflow.com/questions/8958267/java-lang-verifyerror-expecting-a-stackmap-frame

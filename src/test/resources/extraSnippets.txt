@@ -1,3 +1,5 @@
+//content in this file is strictly to define code snippets for export where they do not directly occur in source code
+
 // START SNIPPET groovy-http::Listing1.html
 <!DOCTYPE html>
 <html>
