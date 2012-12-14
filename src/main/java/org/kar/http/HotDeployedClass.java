@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 20012 by Kelly Robinson
+ * Copyright (C) 2012 by Kelly Robinson
  * http://www.kellyrob99.com/
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
@@ -14,9 +14,6 @@ package org.kar.http;
 /**
  * Created with IntelliJ IDEA.
  * User: krobinson
- * Date: 12-11-07
- * Time: 10:23 PM
- * To change this template use File | Settings | File Templates.
  */
 public class HotDeployedClass
 {
