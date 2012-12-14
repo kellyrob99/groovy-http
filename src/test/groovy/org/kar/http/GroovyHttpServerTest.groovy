@@ -144,7 +144,7 @@ class GroovyHttpServerTest extends Specification {
     }
 
     // START SNIPPET Listing8.groovy
-    def "restlet"() {
+    def "restlet reverse test"() {
         when: 'We use the Restlet Client to execute a GET request against the Restlet Server'
         String response = restletClient.get("http://localhost:$RESTLET_SERVER_PORT/?string=$TEST_STRING").entity.text
 
@@ -154,7 +154,7 @@ class GroovyHttpServerTest extends Specification {
     // END SNIPPET Listing8.groovy
 
     // START SNIPPET Listing9.groovy
-    def "restlet failure"() {
+    def "restlet failure with client error"() {
         when: 'We forget to include the required parameter to Restlet'
         org.restlet.data.Response response = restletClient.get("http://localhost:$RESTLET_SERVER_PORT")
 
@@ -167,7 +167,7 @@ class GroovyHttpServerTest extends Specification {
     }
     // END SNIPPET Listing9.groovy
 
-    def "embedded vert.x"() {
+    def "embedded vert.x reverse test"() {
         when: 'We run a vert.x server and create a matching vert.x client'
         // START SNIPPET Listing10.groovy
         Vertx vertx = Vertx.newVertx()
