@@ -20,7 +20,6 @@ apply plugin: 'maven'
 apply plugin: 'project-report'
 apply plugin: 'repositories'
 apply plugin: 'license'
-apply plugin: 'codeSnippet'
 
 group = 'org.kar'
 // http://stackoverflow.com/questions/8958267/java-lang-verifyerror-expecting-a-stackmap-frame
