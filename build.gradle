@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.mapvine:gradle-cobertura-plugin:1.0'
-        classpath 'com.ullink.gradle:gradle-repositories-plugin:1.1-SNAPSHOT' //https://github.com/gluck/gradle-repositories-plugin
+//        classpath 'com.ullink.gradle:gradle-repositories-plugin:1.1-SNAPSHOT' //https://github.com/gluck/gradle-repositories-plugin
         classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.6.0'  //https://github.com/hierynomus/license-gradle-plugin
     }
 }
@@ -18,7 +18,7 @@ apply plugin: 'idea'
 apply plugin: 'jetty'
 apply plugin: 'maven'
 apply plugin: 'project-report'
-apply plugin: 'repositories'
+//apply plugin: 'repositories'
 apply plugin: 'license'
 
 group = 'org.kar'
@@ -31,7 +31,7 @@ repositories {
     maven { url 'http://static.appfuse.org/repository' }
     maven { url 'https://repository.jboss.org/nexus/content/repositories/releases' }
     maven { url 'http://maven.restlet.org' }
-    googlecode('groovy-restlet') // http://groovy-restlet.googlecode.com/files/groovy-restlet-0.3-SNAPSHOT.jar
+//    googlecode('groovy-restlet') // http://groovy-restlet.googlecode.com/files/groovy-restlet-0.3-SNAPSHOT.jar
 }
 
 idea {
@@ -70,7 +70,8 @@ dependencies {
         exclude module: 'groovy'
     }
 
-    compile 'groovy-restlet:groovy-restlet:0.3-SNAPSHOT'
+    compile files('lib/groovy-restlet-0.3-SNAPSHOT.jar')
+//    compile 'groovy-restlet:groovy-restlet:0.3-SNAPSHOT'
 //    compile 'org.restlet.jse:org.restlet:2.1.0' // not compatible with groovy-restlet unfortunately
     compile 'org.restlet:org.restlet:1.1.10'
     compile 'org.springframework:spring-context:2.5.6'
