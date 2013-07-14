@@ -45,15 +45,15 @@ idea {
 }
 
 ext.versions = [
-        'groovy': '2.0.5',
+        'groovy': '2.1.6',
         'jsp': '2.1',
-        'junit': '4.10',
+        'junit': '4.11',
         'servlet': '2.5',
         'jstl': '1.2',
-        'slf4j': '1.6.1',
-        'log4j': '1.2.16',
+        'slf4j': '1.7.5',
+        'log4j': '1.2.17',
         'spock': '0.7-groovy-2.0',
-        'hsqldb': '2.2.8',
+        'hsqldb': '2.2.9',
         'cglib': '2.2.2'
 ]
 
@@ -62,11 +62,11 @@ dependencies {
     providedCompile "javax.servlet:servlet-api:${versions.servlet}"
     providedCompile "javax.servlet:jstl:${versions.jstl}"
 
-    groovy "org.codehaus.groovy:groovy-all:${versions.groovy}"
+    compile "org.codehaus.groovy:groovy-all:${versions.groovy}"
     compile "org.slf4j:slf4j-api:${versions.slf4j}"
     compile "log4j:log4j:${versions.log4j}"
 
-    compile('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') {
+    compile('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
         exclude module: 'groovy'
     }
 
@@ -74,14 +74,14 @@ dependencies {
 //    compile 'groovy-restlet:groovy-restlet:0.3-SNAPSHOT'
 //    compile 'org.restlet.jse:org.restlet:2.1.0' // not compatible with groovy-restlet unfortunately
     compile 'org.restlet:org.restlet:1.1.10'
-    compile 'org.springframework:spring-context:2.5.6'
+    compile 'org.springframework:spring-context:3.2.3.RELEASE'
     compile 'com.noelios.restlet:com.noelios.restlet:1.1.10'
 
     runtime "org.slf4j:jcl-over-slf4j:${versions.slf4j}"
     runtime "org.slf4j:slf4j-log4j12:${versions.slf4j}"
     runtime "org.hsqldb:hsqldb:${versions.hsqldb}"
 
-    testCompile 'org.vert-x:vertx-lang-groovy:1.2.3.final'
+    testCompile 'org.vert-x:vertx-lang-groovy:1.3.1.final'
     testCompile "junit:junit:${versions.junit}"
     testCompile "org.spockframework:spock-core:${versions.spock}"
     testCompile 'org.eclipse.jetty.aggregate:jetty-all-server:8.1.0.v20120127'    // this one works !

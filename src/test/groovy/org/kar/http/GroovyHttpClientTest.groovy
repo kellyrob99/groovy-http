@@ -203,7 +203,7 @@ class GroovyHttpClientTest extends Specification {
 
         then:
         responseStatus == HttpServletResponse.SC_OK
-        json instanceof JSONObject
+        json instanceof Map
         json.html.body.p == 'hello world'
     }
     // END SNIPPET groovy-http::Listing10.groovy
