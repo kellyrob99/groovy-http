@@ -119,7 +119,9 @@ license {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.3'
+    gradleVersion = '1.7-rc-1'
 }
 
+// Find any 3rd party libraries which have released new versions
+apply from: 'https://gist.github.com/kellyrob99/a66d49697a02420676fb/raw/c6f1d9a71f1118b2dc861a53563c737d53d3fa72/checkLibVersions.gradle'
 defaultTasks 'jettyRun'
