@@ -116,15 +116,11 @@ class GroovyHttpClientTest extends Specification {
 
     def "from a String to URLConnection with error handling"() {
         when:
-        String html
         final HttpURLConnection connection = makeURL('notThere.groovy').toURL().openConnection()
-        connection.inputStream.withReader { Reader reader ->
-            html = reader.text
-        }
 
         then:
         connection.responseCode == HttpServletResponse.SC_NOT_FOUND
-        def e = thrown(FileNotFoundException)
+        connection.errorStream.text.contains("Error 404 NOT_FOUND")
     }
     // START SNIPPET groovy-http::Listing5.groovy
     def "POST from a URLConnection"() {
